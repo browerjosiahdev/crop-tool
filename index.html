@@ -70,6 +70,7 @@
           float: right;
           height: 100%;
           overflow: hidden;
+          position: relative;
           width: calc(100% - 50px);}
 
           .ImageCropper .tools-area .crop-area:before {
@@ -89,15 +90,14 @@
             width: 300px;}
 
             .ImageCropper .tools-area .crop-area .crop-mask .crop-definer {
-              background-color: rgba(0, 0, 0, 0.5);
-              border: 1px solid #000;
+              border: 1px solid #555;
               cursor: move;
-              height: 100%;
-              left: 0;
+              height: calc(100% - 1px);
+              left: 1;
               pointer-events: none;
               position: absolute;
-              top: 0;
-              width: 100%;
+              top: 1;
+              width: calc(100% - 1px);
             }
 
             .ImageCropper .tools-area .crop-area .crop-mask .crop-image {
@@ -105,7 +105,35 @@
               left: 0;
               position: absolute;
               top: 0;
+          }
+
+          .ImageCropper .tools-area .crop-area .crop-overlay {
+            background-color: rgba(255, 255, 255, 0.5);
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;}
+
+            .ImageCropper .tools-area .crop-area .crop-overlay.bottom {
+              bottom: 0;
+              height: calc((100% - 300px) / 2);
+              top: initial;
             }
+
+            .ImageCropper .tools-area .crop-area .crop-overlay.left {
+              width: calc((100% - 300px) / 2);
+            }
+
+            .ImageCropper .tools-area .crop-area .crop-overlay.right {
+              left: initial;
+              right: 0;
+              width: calc((100% - 300px) / 2);
+            }
+
+            .ImageCropper .tools-area .crop-area .crop-overlay.top {
+              height: calc((100% - 300px) / 2);
+        }
 
         .ImageCropper .tools-area .tool-bar {
           float: left;
@@ -161,6 +189,10 @@
           <img alt="crop image" class="crop-image" draggable="false" src="./img/image.jpg" />
           <div class="crop-definer"></div>
         </div>
+        <div class="crop-overlay bottom"></div>
+        <div class="crop-overlay left"></div>
+        <div class="crop-overlay right"></div>
+        <div class="crop-overlay top"></div>
       </div>
     </div>
   </div>
