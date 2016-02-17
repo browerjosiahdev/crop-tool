@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <title>Image Cropper</title>
+  <style>
+    .ImageCropper {
+      background-color: rgba(0, 0, 0, 0.75);
+      cursor: default;
+      font-size: 14px;
+      height: 100%;
+      left: 0;
+      position: fixed;
+      text-align: center;
+      top: 0;
+      width: 100%;}
+
+      .ImageCropper:before {
+        content: ' ';
+        display: inline-block;
+        height: 100%;
+        margin-right: -0.25em;
+        vertical-align: middle;
+      }
+
+      .ImageCropper .crop-canvas {
+        left: -200%;
+        position: absolute;
+        top: -200%;
+      }
+
+      .ImageCropper .icon {
+        background-position: 0 0;
+        background-repeat: no-repeat;
+        display: block;
+        height: 100%;
+        width: 100%;}
+
+        .ImageCropper .icon.icon-crop {
+          background-image: url('./files/images/icon_crop.svg');
+        }
+
+        .ImageCropper .icon.icon-scale-down {
+          background-image: url('./files/images/icon_scale_down.svg');
+        }
+
+        .ImageCropper .icon.icon-scale-reset {
+          background-image: url('./files/images/icon_scale_reset.svg');
+        }
+
+        .ImageCropper .icon.icon-scale-up {
+          background-image: url('./files/images/icon_scale_up.svg');
+      }
+
+      .ImageCropper .tools-area {
+        background-color: #fff;
+        border-radius: 10px;
+        display: inline-block;
+        height: 100%;
+        max-height: 500px;
+        max-width: 500px;
+        min-height: 300px;
+        min-width: 300px;
+        padding: 10px;
+        vertical-align: middle;
+        width: calc(100% - 30px);}
+
+        .ImageCropper .tools-area .crop-area {
+          float: right;
+          height: 100%;
+          overflow: hidden;
+          width: calc(100% - 50px);}
+
+          .ImageCropper .tools-area .crop-area:before {
+            content: ' ';
+            display: inline-block;
+            height: 100%;
+            margin-right: -0.25em;
+            vertical-align: middle;
+          }
+
+          .ImageCropper .tools-area .crop-area .crop-mask {
+            display: inline-block;
+            height: 300px;
+            margin: 0 auto;
+            position: relative;
+            vertical-align: middle;
+            width: 300px;}
+
+            .ImageCropper .tools-area .crop-area .crop-mask .crop-definer {
+              background-color: rgba(0, 0, 0, 0.5);
+              border: 1px solid #000;
+              cursor: move;
+              height: 100%;
+              left: 0;
+              pointer-events: none;
+              position: absolute;
+              top: 0;
+              width: 100%;
+            }
+
+            .ImageCropper .tools-area .crop-area .crop-mask .crop-image {
+              cursor: move;
+              left: 0;
+              position: absolute;
+              top: 0;
+            }
+
+        .ImageCropper .tools-area .tool-bar {
+          float: left;
+          height: 100%;
+          width: 50px;}
+
+          .ImageCropper .tools-area .tool-bar:before {
+            content: ' ';
+            display: inline-block;
+            height: 100%;
+            margin-right: -0.25em;
+            vertical-align: middle;
+          }
+
+          .ImageCropper .tools-area .tool-bar .tools-container {
+            display: inline-block;
+            vertical-align: middle;
+            width: calc(100% - 5px);}
+
+            .ImageCropper .tools-area .tool-bar .tools-container .tool {
+              background: none;
+              border: none;
+              cursor: pointer;
+              display: block;
+              height: 30px;
+              margin: 15px 0;
+              outline: none;
+              width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="ImageCropper">
+    <div class="tools-area">
+      <div class="tool-bar">
+        <div class="tools-container">
+          <button class="btn-crop tool" type="button">
+            <span class="icon icon-crop"></span>
+          </button>
+          <button class="btn-scale-up tool" type="button">
+            <span class="icon icon-scale-up"></span>
+          </button>
+          <button class="btn-scale-down tool" type="button">
+            <span class="icon icon-scale-down"></span>
+          </button>
+          <button class="btn-scale-reset tool" type="button">
+            <span class="icon icon-scale-reset"></span>
+          </button>
+        </div>
+      </div>
+      <div class="crop-area">
+        <div class="crop-mask">
+          <img alt="crop image" class="crop-image" draggable="false" src="./files/images/image.jpg" />
+          <div class="crop-definer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+  <script src="http://cdn.extendjs.org/0.2.3/extend.min.js"></script>
+  <script src="./CropTool.js"></script>
+  <script>
+    var cropper = $('.ImageCropper');
+    var cropTool = new CropTool(cropper);
+
+    cropper.on(cropTool.CROPCOMPLETE, function (e) {
+      console.log('crop complete');
+      console.log(cropTool.getDataUrl());
+    });
+  </script>
+</body>
+</html>
