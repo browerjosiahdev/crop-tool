@@ -55,9 +55,15 @@ var CropTool = Class.extend(function () {
         height: Math.max(_image.height(), _image.get(0).height, _image.get(0).clientHeight),
         width: Math.max(_image.width(), _image.get(0).width, _image.get(0).clientWidth)
       };
-      _initialScale = _mask.width() / _initialDimensions.width;
+      _initialScale;
+
+      var widthScale  = _mask.width() / _initialDimensions.width,
+          heightScale = _mask.height() / _initialDimensions.height;
+
+      _initialScale = Math.max(widthScale, heightScale);
 
       this.setScale(_initialScale);
+      this.centerImage();
     }
   }
 
@@ -177,10 +183,7 @@ var CropTool = Class.extend(function () {
   **/
   function onScaleResetBtnClick (e) {
     this.setScale(_initialScale);
-
-    // Set the image back to 0x0, otherwise it might go
-    // off screen depending on how much it is being scaled.
-    _image.css({ left: 0, top: 0 });
+    this.centerImage();
   }
 
   /**
@@ -194,6 +197,18 @@ var CropTool = Class.extend(function () {
     var scalePercent = parseInt($(e.currentTarget).data('scale-by')) || 0.1;
     this.setScale(_scale + (_scale * scalePercent));
   }
+
+  /**
+   * @method centerImage (public)
+   *
+   * Called to center the image in the mask area.
+  **/
+  this.centerImage = function () {
+    _image.css({
+      left: (((_mask.width() - _image.width()) / 2) + 'px'),
+      top: (((_mask.height() - _image.height()) / 2) + 'px')
+    });
+  };
 
   /**
    * @method constructor (public)

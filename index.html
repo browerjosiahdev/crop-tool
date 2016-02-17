@@ -82,6 +82,7 @@
           }
 
           .ImageCropper .tools-area .crop-area .crop-mask {
+            background-color: #000;
             display: inline-block;
             height: 300px;
             margin: 0 auto;
@@ -90,14 +91,13 @@
             width: 300px;}
 
             .ImageCropper .tools-area .crop-area .crop-mask .crop-definer {
-              border: 1px solid #555;
               cursor: move;
-              height: calc(100% - 1px);
-              left: 1;
+              height: 100%;
+              left: 0;
               pointer-events: none;
               position: absolute;
-              top: 1;
-              width: calc(100% - 1px);
+              top: 0;
+              width: 100%;
             }
 
             .ImageCropper .tools-area .crop-area .crop-mask .crop-image {
@@ -170,16 +170,16 @@
     <div class="tools-area">
       <div class="tool-bar">
         <div class="tools-container">
-          <button class="btn-crop tool" type="button">
+          <button class="btn-crop tool" title="Crop" type="button">
             <span class="icon icon-crop"></span>
           </button>
-          <button class="btn-scale-up tool" type="button">
+          <button class="btn-scale-up tool" title="Scale Up" type="button">
             <span class="icon icon-scale-up"></span>
           </button>
-          <button class="btn-scale-down tool" type="button">
+          <button class="btn-scale-down tool" title="Scale Down" type="button">
             <span class="icon icon-scale-down"></span>
           </button>
-          <button class="btn-scale-reset tool" type="button">
+          <button class="btn-scale-reset tool" title="Reset Scale" type="button">
             <span class="icon icon-scale-reset"></span>
           </button>
         </div>

@@ -94,4 +94,7 @@ The following are valid methods that can be called:
 ```javascript
 // Call to run the crop, and get a new data URL.
 cropper.crop();
+
+// Called to center the image within the mask area.
+cropper.centerImage();
 ```
