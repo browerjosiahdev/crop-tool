@@ -50,21 +50,20 @@ var CropTool = Class.extend(function () {
       console.error('CropTool.initializeImage() => no image found. Make sure you have an element with class of "crop-image" within the "crop-mask" element.');
     }
 
-    if (_mask.width() != _image.width()) {
-      _initialDimensions = {
-        height: Math.max(_image.height(), _image.get(0).height, _image.get(0).clientHeight),
-        width: Math.max(_image.width(), _image.get(0).width, _image.get(0).clientWidth)
-      };
-      _initialScale;
+    var domImage = _image.get(0);
+    _initialDimensions = {
+      height: Math.max(_image.height(), domImage.height, domImage.clientHeight, domImage.naturalHeight),
+      width: Math.max(_image.width(), domImage.width, domImage.clientWidth, domImage.naturalWidth)
+    };
+    _initialScale;
 
-      var widthScale  = _mask.width() / _initialDimensions.width,
-          heightScale = _mask.height() / _initialDimensions.height;
+    var widthScale  = _mask.width() / _initialDimensions.width,
+        heightScale = _mask.height() / _initialDimensions.height;
 
-      _initialScale = Math.max(widthScale, heightScale);
+    _initialScale = Math.max(widthScale, heightScale);
 
-      this.setScale(_initialScale);
-      this.centerImage();
-    }
+    this.setScale(_initialScale);
+    this.centerImage();
   }
 
   /**
