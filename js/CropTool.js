@@ -2,6 +2,7 @@ var CropTool = Class.extend(function () {
   this.CROPCOMPLETE = 'CROP_COMPLETE'; // Event fired when the crop is complete.
 
   var _dataUrl; // Handle to the data url from the latest crop.
+  var _debug; // Should we show the debug logs?
   var _mask; // Handle to the image mask jquery element.
   var _moveOffset; // Left/top values defining the offset of the mouse (touch) to the image top/left when moving.
   var _image; // Handle to the image jquery element.
@@ -18,6 +19,7 @@ var CropTool = Class.extend(function () {
   function initializeEvents () {
     this.handleCrop           = onCropBtnClick.bind(this);
     this.handleScaleDown      = onScaleDownBtnClick.bind(this);
+    this.handleScaleFull      = onScaleFullBtnClick.bind(this);
     this.handleScaleReset     = onScaleResetBtnClick.bind(this);
     this.handleScaleUp        = onScaleUpBtnClick.bind(this);
     this.handleImageMouseDown = onImageMouseDown.bind(this);
@@ -26,6 +28,7 @@ var CropTool = Class.extend(function () {
 
     _scope.find('.btn-crop').on('click', this.handleCrop);
     _scope.find('.btn-scale-down').on('click', this.handleScaleDown);
+    _scope.find('.btn-scale-full').on('click', this.handleScaleFull);
     _scope.find('.btn-scale-reset').on('click', this.handleScaleReset);
     _scope.find('.btn-scale-up').on('click', this.handleScaleUp);
     _image.on('mousedown touchstart', this.handleImageMouseDown);
@@ -48,8 +51,11 @@ var CropTool = Class.extend(function () {
     }
 
     if (_mask.width() != _image.width()) {
-      _initialScale      = _mask.width() / _image.width();
-      _initialDimensions = { height: _image.height(), width: _image.width() };
+      _initialDimensions = {
+        height: Math.max(_image.height(), _image.get(0).height, _image.get(0).clientHeight),
+        width: Math.max(_image.width(), _image.get(0).width, _image.get(0).clientWidth)
+      };
+      _initialScale = _mask.width() / _initialDimensions.width;
 
       this.setScale(_initialScale);
     }
@@ -148,6 +154,21 @@ var CropTool = Class.extend(function () {
   }
 
   /**
+   * @method onScaleFullBtnClick (private)
+   *
+   * Called when the scale full tool is clicked to scale the image to full size.
+   *
+   * @param e - Handle to the event data.
+  **/
+  function onScaleFullBtnClick (e) {
+    this.setScale(1);
+
+    // Set the image back to 0x0, otherwise it might go
+    // off screen depending on how much it is being scaled.
+    _image.css({ left: 0, top: 0 });
+  }
+
+  /**
    * @method onScaleResetBtnClick (private)
    *
    * Called when the scale reset tool is clicked to scale the image to the initial state.
@@ -156,6 +177,10 @@ var CropTool = Class.extend(function () {
   **/
   function onScaleResetBtnClick (e) {
     this.setScale(_initialScale);
+
+    // Set the image back to 0x0, otherwise it might go
+    // off screen depending on how much it is being scaled.
+    _image.css({ left: 0, top: 0 });
   }
 
   /**
@@ -176,9 +201,11 @@ var CropTool = Class.extend(function () {
    * Called when a new instance of the class is initialized.
    *
    * @param toolDom - Handle to the DOM element to be used as the crop tool.
+   * @param debug - (false) true/false value of whether the debug logs should be shown.
   **/
-  this.constructor = function (toolDom) {
+  this.constructor = function (toolDom, debug) {
     if (toolDom) {
+      _debug = !!debug; // Make sure the debug value is a boolean.
       _scope = toolDom.length
         ? toolDom
         : $(toolDom);
@@ -223,23 +250,23 @@ var CropTool = Class.extend(function () {
         image: _image.get(0),
         sheight: Math.round((imageDetails.height - imageDetails.top) / _scale),
         swidth: Math.round((imageDetails.width - imageDetails.left) / _scale),
-        sx: (
+        sx: Math.round(
           imageDetails.left < 0
             ? Math.abs(imageDetails.left / _scale)
             : 0
         ),
-        sy: (
+        sy: Math.round(
           imageDetails.top < 0
             ? Math.abs(imageDetails.top / _scale)
             : 0
         ),
         width: 0,
-        x: (
+        x: Math.round(
           imageDetails.left > 0
             ? imageDetails.left
             : 0
         ),
-        y: (
+        y: Math.round(
           imageDetails.top > 0
             ? imageDetails.top
             : 0
@@ -247,6 +274,19 @@ var CropTool = Class.extend(function () {
       };
       canvasDetails.height = Math.round(canvasDetails.sheight * _scale);
       canvasDetails.width  = Math.round(canvasDetails.swidth * _scale);
+
+      if (_debug) {
+        console.log('CropTool.crop() => ');
+        console.log('image == ' + canvasDetails.image);
+        console.log('sx == ' + canvasDetails.sx);
+        console.log('sy == ' + canvasDetails.sy);
+        console.log('swidth == ' + canvasDetails.swidth);
+        console.log('sheight == ' + canvasDetails.sheight);
+        console.log('x == ' + canvasDetails.x);
+        console.log('y == ' + canvasDetails.y);
+        console.log('width == ' + canvasDetails.width);
+        console.log('height == ' + canvasDetails.height);
+      }
 
       // Draw the image.
       context.drawImage(
@@ -284,6 +324,21 @@ var CropTool = Class.extend(function () {
   };
 
   /**
+   * @method getImageDetails (public)
+   *
+   * Called to get the image details such as left, top, etc.
+   *
+   * @returns current details for the image.
+  **/
+  this.getImageDetails = function () {
+    var position = _image.position();
+    return {
+      left: position.left,
+      top: position.top
+    };
+  };
+
+  /**
    * @method getInitialScale (public)
    *
    * Called to get the initial scale applied to the image
@@ -313,6 +368,11 @@ var CropTool = Class.extend(function () {
         height: ((_initialDimensions.height * _scale) + 'px'),
         width: ((_initialDimensions.width * _scale) + 'px')
       });
+
+      if (_debug) {
+        console.log('CropTool.setScale() => ');
+        console.log('_scale == ' + _scale);
+      }
     } else {
       console.error('CropTool.setScale() => trying to set scale when no image is defined.');
     }

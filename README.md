@@ -55,6 +55,9 @@ The below example is based on the example HTML structure defined above:
 // Handle to the DOM element to hook the events up to (doesn't have to be a jQuery object).
 var cropper  = $('.ImageCropper');
 // Initialize a new CropTool instance and pass in the DOM element.
+// There is an optional second parameter for the constructor that is
+// a boolean defining whether or not to show debug statements. It
+// defaults to false.
 var cropTool = new CropTool(cropper);
 
 // You can add a 'CROPCOMPLETE' event listener to the DOM element given which will be fired
@@ -74,6 +77,9 @@ cropper.getInitialScale();
 
 // Get the current scale applied to the image.
 cropper.getScale();
+
+// Get the current details of the image: {left, top}
+cropper.getImageDetails();
 ```
 
 The following are valid setters:
