@@ -4,7 +4,7 @@ CropTool.js is a lightweight JavaScript library used to take a DOM element you g
 required to make cropping an image client side simple. There are some basic structural rules around how your
 DOM element has to be setup, but other than that you can style as you desire.
 
-**_NOTE: [jQuery]: http://jquery.com/ and [Extendjs]: http://extendjs.org/ are required for this library to work._**
+**_NOTE: [jQuery](http://jquery.com/) and [Extendjs](http://extendjs.org/) are required for this library to work._**
 
 Here is a basic example of how you element can be structured
 ```html
