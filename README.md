@@ -42,10 +42,14 @@ the desired crop output, and `crop-image` should be positioned absolutely, relat
 Particular classes applied to elements will force those elements to have particular events hooked up:
 - `btn-crop` will hook up the event to produce the cropped image.
 - `btn-scale-up` will hook up the event to scale the image up.
-  - A `data-scale-by` attribute can be added to this element to define the percent (0-1 not 0-100) to scale by.
+  - A `data-scale-by` attribute can be added to this element to define the percent (0-1 not 0-100) to scale by. **__Default is 0.1__**
 - `btn-scale-down` will hook up the event to scale the image down.
-  - A `data-scale-by` attribute can be added to this element to define the percent (0-1 not 0-100) to scale by.
+  - A `data-scale-by` attribute can be added to this element to define the percent (0-1 not 0-100) to scale by. **__Default is 0.1__**
 - `btn-scale-reset` will hook up the event to reset the image to the initial scale.
+- `btn-rotate-left` will hook up the event to rotate the image counter-clockwise.
+  - A `data-rotate-by` attribute can be added to this element to define the number of degrees (0-360) to rotate by. **__Default is 90__**
+- `btn-rotate-right` will hook up the event to rotate the image clockwise.
+  - A `data-rotate-by` attribute can be added to this element to define the number of degrees (0-360) to rotate by. **__Default is 90__**
 
 **_NOTE: The image is initially scaled to fit the width of the crop area_**
 
@@ -80,6 +84,9 @@ cropper.getScale();
 
 // Get the current details of the image: {left, top}
 cropper.getImageDetails();
+
+// Get the current rotation in degrees.
+cropper.getRotation();
 ```
 
 The following are valid setters:
@@ -87,6 +94,9 @@ The following are valid setters:
 ```javascript
 // Set the scale to be applied to the image (0-1 not 0-100)
 cropper.setScale(1);
+
+// Set the rotation in degrees between 0 and 360.
+cropper.setRotation(90);
 ```
 
 The following are valid methods that can be called:

@@ -10,6 +10,7 @@ var CropTool = Class.extend(function () {
   var _initialDimensions; // Height/width dimensions of the origin image size.
   var _scale; // Value of the current image scale.
   var _scope; // jquery handle to the DOM element being used as the crop tool.
+  var _rotation; // Value of the current image rotation in degrees.
 
   /**
    * @method initializeEvents (private)
@@ -18,6 +19,8 @@ var CropTool = Class.extend(function () {
   **/
   function initializeEvents () {
     this.handleCrop           = onCropBtnClick.bind(this);
+    this.handleRotateLeft     = onRotateLeftBtnClick.bind(this);
+    this.handleRotateRight    = onRotateRightBtnClick.bind(this);
     this.handleScaleDown      = onScaleDownBtnClick.bind(this);
     this.handleScaleFull      = onScaleFullBtnClick.bind(this);
     this.handleScaleReset     = onScaleResetBtnClick.bind(this);
@@ -27,6 +30,8 @@ var CropTool = Class.extend(function () {
     this.handleMouseUp        = onMouseUp.bind(this);
 
     _scope.find('.btn-crop').on('click', this.handleCrop);
+    _scope.find('.btn-rotate-left').on('click', this.handleRotateLeft);
+    _scope.find('.btn-rotate-right').on('click', this.handleRotateRight);
     _scope.find('.btn-scale-down').on('click', this.handleScaleDown);
     _scope.find('.btn-scale-full').on('click', this.handleScaleFull);
     _scope.find('.btn-scale-reset').on('click', this.handleScaleReset);
@@ -62,6 +67,15 @@ var CropTool = Class.extend(function () {
 
     _initialScale = Math.max(widthScale, heightScale);
 
+    if (_debug) {
+        console.log('CropTool.initializeImage() => ');
+        console.log('widthScale == ' + widthScale);
+        console.log('heightScale == ' + heightScale);
+        console.log('_initialDimensions == ');
+        console.dir(_initialDimensions);
+    }
+
+    _rotation = 0;
     this.setScale(_initialScale);
     this.centerImage();
   }
@@ -147,6 +161,50 @@ var CropTool = Class.extend(function () {
   }
 
   /**
+   * @method onRotateLeftBtnClick (private)
+   *
+   * Called when the rotate left tool is clicked to rotate the tool to rotate the image 90 degrees counter-clockwise.
+   *
+   * @param e - Handle to the event data.
+  **/
+  function onRotateLeftBtnClick (e) {
+    var degrees = Math.max(Math.min((parseInt($(e.currentTarget).data('rotate-by')) || 90), 360), 0);
+
+    if (_debug) {
+      console.log('CropTool.onRotateLeftBtnClick() => ');
+      console.log('rotate by == ' + degrees);
+    }
+
+    _rotation -= degrees;
+    if (_rotation < 0) {
+      _rotation += 360;
+    }
+    this.setRotation(_rotation);
+  }
+
+  /**
+   * @method onRotateRightBtnClick (private)
+   *
+   * Called when the rotate right tool is clicked to rotate the tool to rotate the image 90 degrees clockwise.
+   *
+   * @param e - Handle to the event data.
+  **/
+  function onRotateRightBtnClick (e) {
+    var degrees = Math.max(Math.min((parseInt($(e.currentTarget).data('rotate-by')) || 90), 360), 0);
+
+    if (_debug) {
+      console.log('CropTool.onRotateRightBtnClick() => ');
+      console.log('rotate by == ' + degrees);
+    }
+
+    _rotation += degrees;
+    if (_rotation > 360) {
+      _rotation -= 360;
+    }
+    this.setRotation(_rotation);
+  }
+
+  /**
    * @method onScaleDownBtnClick (private)
    *
    * Called when the scale down tool is clicked to scale the image down by the defined percent.
@@ -154,7 +212,13 @@ var CropTool = Class.extend(function () {
    * @param e - Handle to the event data.
   **/
   function onScaleDownBtnClick (e) {
-    var scalePercent = parseInt($(e.currentTarget).data('scale-by')) || 0.1;
+    var scalePercent = parseFloat($(e.currentTarget).data('scale-by')) || 0.1;
+
+    if (_debug) {
+      console.log('CropTool.onScaleDownBtnClick() => ');
+      console.log('scale by == ' + scalePercent);
+    }
+
     this.setScale(_scale - (_scale * scalePercent));
   }
 
@@ -193,7 +257,13 @@ var CropTool = Class.extend(function () {
    * @param e - Handle to the event data.
   **/
   function onScaleUpBtnClick (e) {
-    var scalePercent = parseInt($(e.currentTarget).data('scale-by')) || 0.1;
+    var scalePercent = parseFloat($(e.currentTarget).data('scale-by')) || 0.1;
+
+    if (_debug) {
+      console.log('CropTool.onScaleUpBtnClick() => ');
+      console.log('scale by == ' + scalePercent);
+    }
+
     this.setScale(_scale + (_scale * scalePercent));
   }
 
@@ -203,9 +273,10 @@ var CropTool = Class.extend(function () {
    * Called to center the image in the mask area.
   **/
   this.centerImage = function () {
+    var imageDetails = this.getImageDetails();
     _image.css({
-      left: (((_mask.width() - _image.width()) / 2) + 'px'),
-      top: (((_mask.height() - _image.height()) / 2) + 'px')
+      left: (((_mask.width() - imageDetails.width) / 2) + 'px'),
+      top: (((_mask.height() - imageDetails.height) / 2) + 'px')
     });
   };
 
@@ -253,12 +324,7 @@ var CropTool = Class.extend(function () {
 
     if (canvas) {
       var context = canvas.getContext('2d');
-      var imageDetails = { // Get the current image details.
-        height: _image.height(),
-        left: _image.position().left,
-        top: _image.position().top,
-        width: _image.width()
-      };
+      var imageDetails = this.getImageDetails();
       var canvasDetails = { // Calculate the details for how to draw the image on the canvas.
         height: 0,
         image: _image.get(0),
@@ -347,8 +413,10 @@ var CropTool = Class.extend(function () {
   this.getImageDetails = function () {
     var position = _image.position();
     return {
+      height: _image.height(),
       left: position.left,
-      top: position.top
+      top: position.top,
+      width: _image.width()
     };
   };
 
@@ -379,8 +447,8 @@ var CropTool = Class.extend(function () {
     _scale = scale;
     if (_image.length) {
       _image.css({
-        height: ((_initialDimensions.height * _scale) + 'px'),
-        width: ((_initialDimensions.width * _scale) + 'px')
+          height: ((_initialDimensions.height * _scale) + 'px'),
+          width: ((_initialDimensions.width * _scale) + 'px')
       });
 
       if (_debug) {
@@ -388,7 +456,39 @@ var CropTool = Class.extend(function () {
         console.log('_scale == ' + _scale);
       }
     } else {
-      console.error('CropTool.setScale() => trying to set scale when no image is defined.');
+      console.warn('CropTool.setScale() => trying to set scale when no image is defined.');
+    }
+  };
+
+  /**
+   * @method getRotation/setRotation (public)
+   *
+   * Called to get/set the current rotation (in degrees) applied to the image.
+   *
+   * @param degrees - Rotation in degrees to apply to the image.
+   *
+   * @returns current rotation applied to the image.
+  **/
+  this.getRotation = function () {
+    return _rotation;
+  };
+  this.setRotation = function (degrees) {
+    _rotation = Math.max(Math.min(degrees, 360), 0);
+    if (_image.length) {
+      _image.css({
+        mozTransform: 'rotateZ(' + degrees + 'deg)',
+        msTransform: 'rotateZ(' + degrees + 'deg)',
+        oTransform: 'rotateZ(' + degrees + 'deg)',
+        transform: 'rotateZ(' + degrees + 'deg)',
+        webkitTransform: 'rotateZ(' + degrees + 'deg)'
+      });
+
+      if (_debug) {
+        console.log('CropTool.setRotation() => ');
+        console.log('_rotation == ' + _rotation);
+      }
+    } else {
+      console.warn('CropTool.setRotation() => trying to set rotation when no image is defined.');
     }
   };
 });

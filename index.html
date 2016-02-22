@@ -105,6 +105,12 @@
               left: 0;
               position: absolute;
               top: 0;
+
+              -webkit-transform-origin: center center;
+                 -moz-transform-origin: center center;
+                  -ms-transform-origin: center center;
+                   -o-transform-origin: center center;
+                      transform-origin: center center;
           }
 
           .ImageCropper .tools-area .crop-area .crop-overlay {
@@ -173,10 +179,10 @@
           <button class="btn-crop tool" title="Crop" type="button">
             <span class="icon icon-crop"></span>
           </button>
-          <button class="btn-scale-up tool" title="Scale Up" type="button">
+          <button class="btn-scale-up tool" data-scale-by="0.1" title="Scale Up" type="button">
             <span class="icon icon-scale-up"></span>
           </button>
-          <button class="btn-scale-down tool" title="Scale Down" type="button">
+          <button class="btn-scale-down tool" data-scale-by="0.1" title="Scale Down" type="button">
             <span class="icon icon-scale-down"></span>
           </button>
           <button class="btn-scale-reset tool" title="Reset Scale" type="button">
@@ -201,7 +207,8 @@
   <script src="./js/CropTool.js"></script>
   <script>
     var cropper = $('.ImageCropper');
-    var cropTool = new CropTool(cropper);
+    var debug = false;
+    var cropTool = new CropTool(cropper, debug);
 
     cropper.on(cropTool.CROPCOMPLETE, function (e) {
       console.log('crop complete');
