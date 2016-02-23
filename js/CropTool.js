@@ -62,8 +62,8 @@ var CropTool = Class.extend(function () {
     };
     _initialScale;
 
-    var widthScale  = _mask.width() / _initialDimensions.width,
-        heightScale = _mask.height() / _initialDimensions.height;
+    var widthScale  = _mask.width() / _initialDimensions.width;
+    var heightScale = _mask.height() / _initialDimensions.height;
 
     _initialScale = Math.max(widthScale, heightScale);
 
@@ -101,9 +101,12 @@ var CropTool = Class.extend(function () {
   function onImageMouseDown (e) {
     e.preventDefault();
 
-    var imageOffset = _image.offset(),
-        maskOffset  = _mask.offset();
-
+    // Using offset instead of position because based on the layout the image may
+    // not be positioned relative to the mask (even through it should be). Doing it
+    // this way makes sure we measure the offset of the image compared to the mask
+    // no matter how the image is positioned.
+    var imageOffset = _image.offset();
+    var maskOffset  = _mask.offset();
     _moveOffset = {
       left: (
         e.originalEvent && e.originalEvent.touches
@@ -142,9 +145,14 @@ var CropTool = Class.extend(function () {
       )
     };
 
+    // Fix for rotation positioning issue with rectangular images.
+    var sizeDiff = _rotation == 90 || _rotation == 270
+      ? (_image.width() - _image.height()) / 2
+      : 0;
+
     _image.css({
-      left: ((mousePos.left - _moveOffset.left) + 'px'),
-      top: ((mousePos.top - _moveOffset.top) + 'px')
+      left: ((mousePos.left - _moveOffset.left - sizeDiff) + 'px'),
+      top: ((mousePos.top - _moveOffset.top + sizeDiff) + 'px')
     });
   }
 
